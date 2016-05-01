@@ -4,16 +4,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent" android:layout_height="match_parent"
     android:padding="@dimen/activity_vertical_margin"
-    android:background="@color/colorPrimaryDark"
+    android:background="#424242"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.studiostyche.apps.flashsos.MainActivity"
-    tools:showIn="@layout/activity_main">
+    tools:context="com.studiostyche.apps.flashsos.MainActivity">
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
         android:layout_margin="@dimen/fab_margin"
         android:src="@drawable/ic_flash_on_black_24dp" />
+    <TextureView
+        android:id="@+id/preview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/fab" />
 </RelativeLayout>
