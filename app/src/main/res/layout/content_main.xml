@@ -17,13 +17,15 @@
         android:background="@drawable/circle"
         android:padding="@dimen/fab_margin"
         android:src="@drawable/ic_flash_on_black_24dp" />
-
-    <Button
-        style="@android:style/Widget.Material.Button.Borderless"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text=" SEND Emergency SOS "
-        android:textColor="#ffff"
-        android:layout_gravity="center|bottom"
-        android:layout_marginBottom="96dp" />
+    <!--
+        <Button
+            style="@android:style/Widget.Material.Button.Borderless"
+            android:id="@+id/btnSendSOS"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=" SEND Emergency SOS "
+            android:textColor="#ffff"
+            android:layout_gravity="center|bottom"
+            android:layout_marginBottom="96dp" />
+            -->
 </FrameLayout>

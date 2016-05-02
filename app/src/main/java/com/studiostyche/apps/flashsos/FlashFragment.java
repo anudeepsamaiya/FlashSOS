@@ -133,44 +133,6 @@ public class FlashFragment extends Fragment {
         }
     }
 
-    private void setupFlashImageView(View view) {
-        // Switch button click event to toggle flash on/off
-        imageView = (ImageView) view.findViewById(R.id.imgFlash);
-        imageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!flashState) {
-                    flashState = true;
-                    toggleFlashLight(flashState);
-                    ((ImageView) v).setImageResource(R.drawable.ic_flash_off_black_24dp);
-
-                    Snackbar.make(v, "Flash Enabled", Snackbar.LENGTH_LONG)
-                            .setAction("Turn Off", new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    flashState = false;
-                                    toggleFlashLight(flashState);
-                                }
-                            })
-                            .show();
-                } else {
-                    flashState = false;
-                    toggleFlashLight(flashState);
-                    ((ImageView) v).setImageResource(R.drawable.ic_flash_on_black_24dp);
-
-                    Snackbar.make(v, "Flash disabled", Snackbar.LENGTH_LONG)
-                            .setAction("Turn On", new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    flashState = true;
-                                    toggleFlashLight(flashState);
-                                }
-                            })
-                            .show();
-                }
-            }
-        });
-    }
 
     private void setupCamera() {
         cameraManager =
@@ -199,7 +161,6 @@ public class FlashFragment extends Fragment {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
     }
 
     CameraDevice.StateCallback mStateCallback = new CameraDevice.StateCallback() {
@@ -281,17 +242,50 @@ public class FlashFragment extends Fragment {
         return chosen;
     }
 
-    public void toggleFlashLight(boolean flashState) {
+    private void setupFlashImageView(View view) {
+        // Switch button click event to toggle flash on/off
+        imageView = (ImageView) view.findViewById(R.id.imgFlash);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!flashState) {
+                    flashState = true;
+                    toggleFlashState(CameraMetadata.FLASH_MODE_TORCH);
+                    ((ImageView) v).setImageResource(R.drawable.ic_flash_off_black_24dp);
+
+                    Snackbar.make(v, "Flash Enabled", Snackbar.LENGTH_LONG)
+                            .setAction("Turn Off", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    flashState = false;
+                                    toggleFlashState(CameraMetadata.FLASH_MODE_OFF);
+                                }
+                            }).show();
+                } else {
+                    flashState = false;
+                    toggleFlashState(CameraMetadata.FLASH_MODE_OFF);
+                    ((ImageView) v).setImageResource(R.drawable.ic_flash_on_black_24dp);
+
+                    Snackbar.make(v, "Flash disabled", Snackbar.LENGTH_LONG)
+                            .setAction("Turn On", new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    flashState = true;
+                                    toggleFlashState(CameraMetadata.FLASH_MODE_TORCH);
+                                }
+                            }).show();
+                }
+            }
+        });
+    }
+
+    public void toggleFlashState(int flashState) {
         try {
-            if (flashState)
-                builder.set(CaptureRequest.FLASH_MODE, CameraMetadata.FLASH_MODE_TORCH);
-            else builder.set(CaptureRequest.FLASH_MODE, CameraMetadata.FLASH_MODE_OFF);
-
+            builder.set(CaptureRequest.FLASH_MODE, flashState);
             cameraCaptureSession.setRepeatingRequest(builder.build(), null, null);
-
         } catch (Exception e) {
             e.printStackTrace();
-            showErrorDialog("Flash failed:\n" + e.toString());
+            showErrorDialog("Flash failed:\n" + e.toString() + "\n Try Restarting the App.");
         }
     }
 
