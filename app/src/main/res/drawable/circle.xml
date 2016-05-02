@@ -10,5 +10,4 @@
         android:centerColor="@color/colorAccent"
         android:startColor="@color/colorAccent"
         android:endColor="@color/colorAccent" />
-    c
 </shape>

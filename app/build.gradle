@@ -1,30 +1,46 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        config
+    }
     compileSdkVersion 23
     buildToolsVersion "23.0.3"
-
     defaultConfig {
         applicationId "com.studiostyche.apps.flashsos"
         minSdkVersion 21
         targetSdkVersion 23
         versionCode 1
-        versionName "1.0"
+        versionName "0.1"
+        signingConfig signingConfigs.config
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            zipAlignEnabled true
         }
+        debug {
+        }
+    }
+    productFlavors {
     }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
-    compile "com.android.support:support-v4:23.3.0"
-    compile "com.android.support:support-v13:23.3.0"
+    compile 'com.android.support:support-v4:23.3.0'
+    compile 'com.android.support:support-v13:23.3.0'
     compile 'com.android.support:appcompat-v7:23.3.0'
     compile 'com.android.support:design:23.3.0'
     compile 'org.jetbrains:annotations-java5:15.0'
 }
+
+def properties = new Properties()
+properties.load(new FileInputStream(rootProject.file("release.properties")))
+
+android.signingConfigs.config.storeFile rootProject.file(properties.keyStore)
+android.signingConfigs.config.storePassword properties.keyStorePassword
+android.signingConfigs.config.keyAlias properties.keyAlias
+android.signingConfigs.config.keyPassword properties.keyAliasPassword
