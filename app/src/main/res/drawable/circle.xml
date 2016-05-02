@@ -7,8 +7,8 @@
         android:height="32dp" />
 
     <gradient
-        android:centerColor="@color/MaterialGrey300"
-        android:startColor="@color/MaterialGrey300"
-        android:endColor="@color/MaterialGrey300" />
-
+        android:centerColor="@color/colorAccent"
+        android:startColor="@color/colorAccent"
+        android:endColor="@color/colorAccent" />
+    c
 </shape>

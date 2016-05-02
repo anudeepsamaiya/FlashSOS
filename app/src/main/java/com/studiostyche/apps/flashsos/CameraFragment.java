@@ -1,6 +1,7 @@
 package com.studiostyche.apps.flashsos;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -18,9 +19,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
-import android.support.v13.app.FragmentCompat;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Size;
 import android.view.LayoutInflater;
@@ -28,10 +27,11 @@ import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ToggleButton;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by AnudeepSamaiya on 02-05-16.
@@ -51,6 +51,10 @@ public class CameraFragment extends Fragment {
     CameraDevice cameraDevice;
     CaptureRequest.Builder builder;
     CameraCaptureSession cameraCaptureSession;
+    /**
+     * A {@link Semaphore} to prevent the app from exiting before closing the camera.
+     */
+    private Semaphore mCameraOpenCloseLock = new Semaphore(1);
 
     SurfaceTexture surfaceTexture;
     Surface surface;
@@ -78,18 +82,36 @@ public class CameraFragment extends Fragment {
     public void onResume() {
         super.onResume();
         startBackgroundThread();
-        setupCamera();
+        //setupCamera();
     }
 
     @Override
     public void onPause() {
-        close(getView());
+        closeCamera();
         stopBackgroundThread();
         super.onPause();
     }
 
+    private void closeCamera() {
+        try {
+            mCameraOpenCloseLock.acquire();
+            if (null != cameraCaptureSession) {
+                cameraCaptureSession.close();
+                cameraCaptureSession = null;
+            }
+            if (null != cameraDevice) {
+                cameraDevice.close();
+                cameraDevice = null;
+            }
+        } catch (InterruptedException e) {
+            throw new RuntimeException("Interrupted while trying to lock camera closing.", e);
+        } finally {
+            mCameraOpenCloseLock.release();
+        }
+    }
+
     private void requestCameraPermission() {
-        if (FragmentCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.CAMERA)) {
 
             ConfirmationDialog.newInstance(REQUEST_CAMERA_PERMISSION)
                     .show(getChildFragmentManager(), FRAGMENT_DIALOG);
@@ -119,8 +141,10 @@ public class CameraFragment extends Fragment {
             public void onClick(View v) {
                 if (!flashState) {
                     turnOnFlashLight(v);
+                    ((ImageView) v).setImageResource(R.drawable.ic_flash_off_black_24dp);
                 } else {
                     turnOffFlashLight(v);
+                    ((ImageView) v).setImageResource(R.drawable.ic_flash_on_black_24dp);
                 }
             }
         });
@@ -141,12 +165,17 @@ public class CameraFragment extends Fragment {
                         requestCameraPermission();
                         return;
                     }
+                    if (!mCameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
+                        throw new RuntimeException("Time out waiting to lock camera opening.");
+                    }
                     cameraManager.openCamera(cameraId[0], mStateCallback, mBackgroundHandler);
                 }
             }
         } catch (CameraAccessException e) {
             e.printStackTrace();
             showErrorDialog(e.toString());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
 
     }
@@ -154,6 +183,7 @@ public class CameraFragment extends Fragment {
     CameraDevice.StateCallback mStateCallback = new CameraDevice.StateCallback() {
         @Override
         public void onOpened(CameraDevice camera) {
+            mCameraOpenCloseLock.release();
             cameraDevice = camera;
             try {
                 builder = camera.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
@@ -173,13 +203,21 @@ public class CameraFragment extends Fragment {
         }
 
         @Override
-        public void onDisconnected(CameraDevice camera) {
-
+        public void onDisconnected(@NonNull CameraDevice cameraDevice) {
+            mCameraOpenCloseLock.release();
+            cameraDevice.close();
+            cameraDevice = null;
         }
 
         @Override
-        public void onError(CameraDevice camera, int error) {
-
+        public void onError(@NonNull CameraDevice cameraDevice, int error) {
+            mCameraOpenCloseLock.release();
+            cameraDevice.close();
+            cameraDevice = null;
+            Activity activity = getActivity();
+            if (null != activity) {
+                activity.finish();
+            }
         }
     };
 
@@ -280,17 +318,6 @@ public class CameraFragment extends Fragment {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-    }
-
-    private void close(View view) {
-        Snackbar.make(view, "Camera closed", Snackbar.LENGTH_LONG).show();
-        if (cameraDevice == null || cameraCaptureSession == null) {
-            return;
-        }
-        cameraCaptureSession.close();
-        cameraDevice.close();
-        cameraDevice = null;
-        cameraCaptureSession = null;
     }
 
     private void showErrorDialog(String message) {

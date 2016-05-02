@@ -12,15 +12,9 @@
         android:id="@+id/fab"
         android:layout_width="120dp"
         android:layout_height="120dp"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
+        android:padding="@dimen/fab_margin"
+        android:layout_centerInParent="true"
         android:layout_margin="@dimen/fab_margin"
         android:background="@drawable/circle"
         android:src="@drawable/ic_flash_on_black_24dp" />
-<!--
-    <TextureView
-        android:id="@+id/preview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/fab" />-->
 </RelativeLayout>
