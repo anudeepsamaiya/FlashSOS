@@ -8,17 +8,19 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.studiostyche.apps.flashsos.MainActivity">
 
-    <android.support.design.widget.FloatingActionButton
+    <ImageView
         android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_margin="@dimen/fab_margin"
+        android:background="@drawable/circle"
         android:src="@drawable/ic_flash_on_black_24dp" />
+<!--
     <TextureView
         android:id="@+id/preview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/fab" />
+        android:layout_above="@+id/fab" />-->
 </RelativeLayout>
