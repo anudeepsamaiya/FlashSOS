@@ -2,7 +2,6 @@ package com.studiostyche.apps.flashsos;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
@@ -20,6 +19,7 @@ import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.util.Size;
 import android.view.LayoutInflater;
@@ -135,7 +135,7 @@ public class FlashFragment extends Fragment {
 
     private void setupFlashImageView(View view) {
         // Switch button click event to toggle flash on/off
-        imageView = (ImageView) view.findViewById(R.id.fab);
+        imageView = (ImageView) view.findViewById(R.id.imgFlash);
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
